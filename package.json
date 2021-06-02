@@ -1,0 +1,16 @@
+{
+  "name": "blockchain_v1",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "tsc": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@types/node": "^10.5.1",
+    "typescript": "~3.0.0"
+  },
+  "author": "",
+  "license": "ISC"
+}
