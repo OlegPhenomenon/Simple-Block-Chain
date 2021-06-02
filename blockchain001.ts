@@ -1,6 +1,9 @@
 import * as crypto from 'crypto';
 
+// Для того, чтобы блокчейн попал в цепочку, необходимо генерировать блоки пока хэш не будет начинаться с пяти нулей
+
 class Block {
+  readonly nonce: number;
   readonly hash: string; //Хэш этого блока
 
   constructor (
@@ -9,16 +12,28 @@ class Block {
     readonly timestamp: number, // Время создания блока
     readonly data: string, // Данные приложения
   ) {
-    this.hash = this.calculateHash();
+    const { nonce, hash } = this.mine();
+    this.nonce = nonce;
+    this.hash = hash;
   }
 
-  private calculateHash(): string {
-    const data = this.index + this.previousHash + this.timestamp + this.data;
+  private calculateHash(nonce: number): string {
+    const data = this.index + this.previousHash + this.timestamp + this.data + nonce;
 
     return crypto
               .createHash('sha256') // Создает экземпляр объекта Hash для генерации SHA 256-хешей
               .update(data) // Вычисляет и обновляет хеш-значение внутри объекта Hash
               .digest('hex'); // Преобразует хеш-значения в 16-ричную строку
+  }
+
+  private mine(): { nonce: number, hash: string} {
+    let hash: string;
+    let nonce = 0;
+    do {
+      hash = this.calculateHash(++nonce);
+    } while (hash.startsWith('00000') === false);
+
+    return { nonce, hash }
   }
 }
 

@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const crypto = require("crypto");
+// Для того, чтобы блокчейн попал в цепочку, необходимо генерировать блоки пока хэш не будет начинаться с пяти нулей
 class Block {
     constructor(index, // Последовательный номер этого блока
     previousHash, // Хэш предыдущего блока
@@ -10,14 +11,24 @@ class Block {
         this.previousHash = previousHash;
         this.timestamp = timestamp;
         this.data = data;
-        this.hash = this.calculateHash();
+        const { nonce, hash } = this.mine();
+        this.nonce = nonce;
+        this.hash = hash;
     }
-    calculateHash() {
-        const data = this.index + this.previousHash + this.timestamp + this.data;
+    calculateHash(nonce) {
+        const data = this.index + this.previousHash + this.timestamp + this.data + nonce;
         return crypto
             .createHash('sha256') // Создает экземпляр объекта Hash для генерации SHA 256-хешей
             .update(data) // Вычисляет и обновляет хеш-значение внутри объекта Hash
             .digest('hex'); // Преобразует хеш-значения в 16-ричную строку
+    }
+    mine() {
+        let hash;
+        let nonce = 0;
+        do {
+            hash = this.calculateHash(++nonce);
+        } while (hash.startsWith('00000') === false);
+        return { nonce, hash };
     }
 }
 class Blockchain {
